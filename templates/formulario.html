@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clasificador de Subespecies de Perezosos</title>
+    <script>
+        function clasificarPerezoso(event) {
+            event.preventDefault();
+            const clawLength = document.getElementById('claw_length_cm').value;
+            const size = document.getElementById('size_cm').value;
+            const tailLength = document.getElementById('tail_length_cm').value;
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `claw_length_cm=${clawLength}&size_cm=${size}&tail_length_cm=${tailLength}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('resultado').innerText = 'Error: ' + data.error;
+                } else {
+                    document.getElementById('resultado').innerText = 'La subespecie del perezoso es: ' + data.categoria;
+                }
+            })
+            .catch(error => {
+                document.getElementById('resultado').innerText = 'Error en la solicitud.';
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Clasificador de Subespecies de Perezosos</h1>
+    <form id="formulario" onsubmit="clasificarPerezoso(event)">
+        <label for="claw_length_cm">Longitud de la Garra (cm):</label>
+        <input type="text" id="claw_length_cm" name="claw_length_cm"><br><br>
+        <label for="size_cm">Tamaño (cm):</label>
+        <input type="text" id="size_cm" name="size_cm"><br><br>
+        <label for="tail_length_cm">Longitud de la Cola (cm):</label>
+        <input type="text" id="tail_length_cm" name="tail_length_cm"><br><br>
+        <input type="submit" value="Enviar">
+    </form>
+    <p id="resultado"></p>
+</body>
+</html>
